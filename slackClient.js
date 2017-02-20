@@ -1,6 +1,8 @@
 const request = require('request');
 const WebSocket = require('ws');
 
+let channels = {};
+
 const TOKEN = process.env.SLACK_TOKEN;
 
 if (TOKEN === undefined) {
@@ -52,34 +54,20 @@ module.exports = {
         const parsedData = JSON.parse(data);
         slackRequest('groups.list', {}, (groupError, groupResponse, groupData) => {
           const groupsData = JSON.parse(groupData);
-          parsedData.channels = parsedData.channels.concat(groupsData.groups);
-          callback(error, response, JSON.stringify(parsedData));
+          channels = parsedData.channels.concat(groupsData.groups);
+          callback(error, response, JSON.stringify({ channels }));
         });
       }
     });
   },
   joinChannel(name, callback) {
-    slackRequest('channels.join', {
-      name,
-    }, (error, response, data) => {
-      if (callback) {
-        const parsedData = JSON.parse(data);
-        if (!parsedData.ok && parsedData.error === 'name_taken') {
-          slackRequest('groups.list', {}, (groupError, groupResponse, groupData) => {
-            const groupList = JSON.parse(groupData);
-            groupList.groups.forEach((group) => {
-              if (group.name === name) {
-                callback(error, response, JSON.stringify({
-                  channel: group,
-                }));
-              }
-            });
-          });
-        } else {
-          callback(error, response, data);
+    if (callback) {
+      channels.forEach((channel) => {
+        if (channel.name === name) {
+          callback({}, {}, JSON.stringify({ channel }));
         }
-      }
-    });
+      });
+    }
   },
   getChannelHistory(id, callback) {
     const endpoint = id.startsWith('G') ? 'groups.history' : 'channels.history';

@@ -192,7 +192,7 @@ slack.getChannels((error, response, data) => {
   }
 
   const channelData = JSON.parse(data);
-  channels = channelData.channels.filter(channel => !channel.is_archived && !channel.is_mpim);
+  channels = channelData.channels.filter(channel => !channel.is_archived);
 
   components.channelList.setItems(
     channels.map(slackChannel => slackChannel.name)
