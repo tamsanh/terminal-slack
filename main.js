@@ -4,6 +4,8 @@ const path = require('path');
 const ui = require('./userInterface.js');
 const slack = require('./slackClient.js');
 
+const config = require('./config.js');
+
 const components = ui.init(); // ui components
 let users;
 let currentUser;
@@ -97,12 +99,14 @@ function handleNewMessage(message) {
     const author = users.find(user => message.user === user.id);
     username = (author && author.name) || UNKNOWN_USER_NAME;
 
-    notifier.notify({
-      icon: path.join(__dirname, 'Slack_Mark_Black_Web.png'),
-      message: `${username}: ${message.text}`,
-      sound: true,
-      title: 'Terminal Slack',
-    });
+    if (config.notify) {
+      notifier.notify({
+        icon: path.join(__dirname, 'Slack_Mark_Black_Web.png'),
+        message: `${username}: ${message.text}`,
+        sound: true,
+        title: 'Terminal Slack',
+      });
+    }
   }
 
   if (message.channel !== currentChannelId ||
