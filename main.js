@@ -80,9 +80,13 @@ function formatMessageMentions(text) {
   }
 
   // find special words
-  return formattedText.replace(
-    /<!channel>/g,
-    '{yellow-fg}@channel{/yellow-fg}');
+  return formattedText
+    .replace(
+      /<!channel>/g,
+      '{yellow-fg}@channel{/yellow-fg}')
+    .replace(
+      /<!everyone>/g,
+      '{yellow-fg}@everyone{/yellow-fg}');
 }
 
 function handleNewMessage(message) {
